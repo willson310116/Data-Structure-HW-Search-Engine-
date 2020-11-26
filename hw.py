@@ -1,6 +1,6 @@
 import numpy as np
 import os
-
+import time
 ################ Page Rank list ################
 def getpage():
     '''
@@ -235,10 +235,93 @@ def Q3():
             # Q3(d_list[i], DIFF_list[j])
             search_engine(d_list[i], DIFF_list[j], page_mat, test, word_list, word_dict)
 
+# for printing on terminal, no need to write file #
+def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict): 
+    rank = page_rank(d,DIFF,page_mat)[1] # 固定d, DIFF下的page rank
 
-Q1()
-Q2()
-Q3()
+    if " " in input_words: # 多輸入
+        input_words = input_words.split(" ")
+    
+    
+    s = ""
+    
+    if isinstance(input_words,str): # 單一輸入
+        if input_words in word_list: # web有這個字
+            count = 0
+            for i in range(len(rank)):
+                if rank[i] == 500:
+                    continue
+                elif count >= 10:
+                    break
+                elif input_words in word_dict[rank[i]]:
+                    count += 1
+                    s += f"page{rank[i]} "
+        else: # web 沒這個字
+            s += "none"
+
+    elif isinstance(input_words,list): # 多輸入
+
+        # AND part
+        s += f"AND "
+        count = 0
+        if all(word in word_list for word in input_words): # 所有word出現在web裡面->True
+            for i in range(len(rank)):
+                if rank[i] == 500:
+                    continue
+                elif count >= 10:
+                    break
+                elif all(word in word_dict[rank[i]] for word in input_words):
+                    count += 1
+                    s += f"page{rank[i]} "
+                elif i == len(rank)-1 and count == 0: # 沒有一個page同時有這些word的情況 (OR不會有這種情況)
+                    s += "none"
+        else:
+            s += "none"
+
+        s += "\n"
+
+        # OR part
+
+        s += "OR "
+
+        count = 0
+        if any(word in word_list for word in input_words): # 任何一個word出現在web裡面->True
+            for i in range(len(rank)):
+                if rank[i] == 500:
+                    continue
+                elif count >= 10:
+                    break
+                elif any(word in word_dict[rank[i]] for word in input_words):
+                    count += 1
+                    s += f"page{rank[i]} "
+        else:
+            s += "none"
+    # s += "\n"
+    print(s)
+
+    
+
+
+
+# Q1()
+# Q2()
+# Q3()
+
+with open("list.txt") as f:
+        test = f.read().split("\n")
+
+page_mat = getpage()[0] # get page matrix
+word_list, word_dict = getword()
+
+s = input("Type word(s) you want to search\n> ")
+while s!= "*end*":
+    d = float(input("Assign a d (a float from 0~1)\n> "))
+    DIFF = float(input("Assign a DIFF (a float under 0.1 is recommended)\n> "))
+    old_time = time.time()
+    search_engine_2(d, DIFF, page_mat, s, word_list, word_dict)
+    new_time = time.time()
+    print(f"--------It cost {new_time - old_time} sec to search--------")
+    s = input("Type word(s) you want to search\n> ")
 
 
 # 確定有page連到page500
