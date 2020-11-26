@@ -154,7 +154,9 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
     for i in range(len(input_list)):
 		# 單一輸入(str)
         if not isinstance(input_list[i],list):
-            s += f"{input_list[i]}\t"
+
+            # s += f"{input_list[i]}\t"
+
             if input_list[i] in word_list: # web有這個字
                 count = 0
                 for j in range(len(rank)):
@@ -174,7 +176,10 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
             for a in range(len(input_list[i])):
                 item += f"{input_list[i][a]} "
 			# AND 部分
-            s += f"AND ({item.strip()})\t"
+
+            # s += f"AND ({item.strip()})\t"
+            s += f"AND "
+
             count = 0
             if all(word in word_list for word in input_list[i]): # 所有word出現在web裡面->True
                 for j in range(len(rank)):
@@ -194,7 +199,10 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
 
 			# OR 部分
 
-            s += f"OR ({item.strip()})\t"
+            # s += f"OR ({item.strip()})\t"
+
+            s += f"OR "
+
             count = 0
             if any(word in word_list for word in input_list[i]): # 任何一個word出現在web裡面->True
                 for j in range(len(rank)):
