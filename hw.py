@@ -4,15 +4,14 @@ import time
 ################ Page Rank list ################
 def getpage():
     '''
-    The function will return the page rank matrix as a shape of (500,500) numpy.ndarray
+    This function will return the page rank matrix as a shape of (500,500) numpy.ndarray
     and the # of connections of each page as a dictionary.
     '''
     target_dictionary = "./web-search-files/"
     listdir = os.listdir(target_dictionary)
     listdir.remove(".DS_Store")
-    # print(listdir)
     listdir.sort(key = lambda s: float(s[4:])) # sort file name with number
-    # print(listdir)
+    
     page_mat = []
     connect = dict()
     for file in listdir:
@@ -41,7 +40,9 @@ def getpage():
 
 def page_rank(d,DIFF,page_mat):
     """
-    The function will return the latest update and the its rank
+    This function will return the latest update and the its rank based on the d and DIFF
+    d should be a float from 0~1
+    DIFF is recommended to be a float under 0.1
     """
     page_mat_mod = page_mat * d
     # init = np.array([1/500]*500)
@@ -55,48 +56,43 @@ def page_rank(d,DIFF,page_mat):
             break
     return update, update.argsort()[::-1]
 
-# page_mat = getpage()[0]
-# update = page_rank(0.25,0.100,page_mat)[0]
-
 def write_Q1_ans(rank,update,connect,d,DIFF):
     """
-    The function will write our result into the corresponding file
+    This function will write our result (the rank of the pages, connections of each pages and their importance value) 
+    into the corresponding files
     """
     ans = []
     for i in range(len(rank)):
-#     print(f"page{rank[i]}\t{connect[rank[i]]}\t{round(update[rank[i]],8)}")
         result = f"page{rank[i]}\t{connect[rank[i]]}\t{round(update[rank[i]],8)}"
         ans.append(result)
+
     DIFF_dict = {0.100:"100", 0.010:"010", 0.001:"001"}
-    file = "pr_"+str(int(d*100))+"_"+DIFF_dict[DIFF]+".txt"
+    file = "pr_" + str(int(d*100)) + "_" + DIFF_dict[DIFF] + ".txt"
     with open(file,"w") as f:
         f.write('\n'.join(ans))
 
 def Q1():
+    """
+    This function will make files with some combinations of d and DIFF by executing 
+    functions: write_Q1_ans, page_rank, getpage
+    """
     page_mat, connect = getpage()
     d_list = [0.25, 0.45, 0.65, 0.85]
     DIFF_list = [0.100, 0.010, 0.001]
     for i in range(len(d_list)):
         for j in range(len(DIFF_list)):
-            # Q1(d_list[i], DIFF_list[j])
             update, rank = page_rank(d_list[i], DIFF_list[j], page_mat)
             write_Q1_ans(rank, update, connect, d_list[i], DIFF_list[j])
-
-# def Q1(d,DIFF):
-#     update, rank = page_rank(d,DIFF)
-#     write_Q1_ans(rank,update,d,DIFF) 
-
-# page_mat, connect = getpage()
-# d_list = [0.25, 0.45, 0.65, 0.85]
-# DIFF_list = [0.100, 0.010, 0.001]
-# for i in range(len(d_list)):
-#     for j in range(len(DIFF_list)):
-#         Q1(d_list[i], DIFF_list[j])
-
 
 
 ################ Reverse index ################
 def getword():
+    """
+    This function will return a word_list (list) and a word_dictionary (dict)
+    word_list contains all the words contained in every pages (this web)
+    word_dictionary contains page numbers as its keys and the words in that pages as its value,
+    where those keys are str and values are list
+    """
     target_dictionary = "./web-search-files/"
     listdir = os.listdir(target_dictionary)
     listdir.remove(".DS_Store")
@@ -110,7 +106,7 @@ def getword():
                 data = f.read()
                 data_list = data.split("\n")
                 split_index = data_list.index("---------------------")
-                word = data_list[split_index+1:][-2]
+                word = data_list[split_index+1:][-2] # the last item is " "
                 word_list.append(word)
 
     word_dict = dict()
@@ -127,6 +123,10 @@ def getword():
     return new_word_list, word_dict
 
 def find_page(word_list, word_dict):
+    """
+    This function makes a reverseindex.txt file,
+    which contains every words in the web and the pages that contain those words
+    """
     ans = []
     for i in range(len(word_list)):
         s = f"{word_list[i]}\t"
@@ -138,12 +138,24 @@ def find_page(word_list, word_dict):
         f.write('\n'.join(ans))
 
 def Q2():
+    """
+    This function simply execute functions: getword, find_page
+    """
     word_list, word_dict = getword()
     find_page(word_list, word_dict)
 
 ################ Search engine ################
 
 def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
+    """
+    This function will find the top 10 hit page of the words contained in the input_list.
+    If the item in input_list is a str which represents a single word input,
+    then it will just print the reuslt(top 10 page).
+    If the item in input_list is a list which represents multiple words input,
+    then it will print two result, which are AND OR. AND means the page should contain all the input words,
+    while OR means the page can contain any of the input words.
+    Lastly, the function will write the result to the corresponding file.
+    """
     rank = page_rank(d,DIFF,page_mat)[1] # 固定d, DIFF下的page rank
     
     for i in range(len(input_list)):
@@ -199,8 +211,6 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
 
 			# OR 部分
 
-            # s += f"OR ({item.strip()})\t"
-
             s += f"OR "
 
             count = 0
@@ -216,7 +226,7 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
             else:
                 s += "none"
         s += "\n"
-	# print(s)
+
     DIFF_dict = {0.100:"100", 0.010:"010", 0.001:"001"}
     file = "result_"+str(int(d*100))+"_"+DIFF_dict[DIFF]+".txt"
     with open(file,"w") as f:
@@ -224,6 +234,9 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
 		
 
 def Q3():
+    """
+    This function execute search_engine with some combinations of d and DIFF.
+    """
     page_mat = getpage()[0]
     word_list, word_dict = getword() # word_list: web 裡面所有的字，sorted list, word_dict: 每個page包含的字，dict
     with open("list.txt") as f:
@@ -232,16 +245,18 @@ def Q3():
     DIFF_list = [0.100, 0.010, 0.001]
     for i in range(len(d_list)):
         for j in range(len(DIFF_list)):
-            # Q3(d_list[i], DIFF_list[j])
             search_engine(d_list[i], DIFF_list[j], page_mat, test, word_list, word_dict)
 
 # for printing on terminal, no need to write file #
 def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict): 
+    """
+    Different from search_engine, this function allows users to search words manually
+    by input words and assign d and DIFF.
+    """
     rank = page_rank(d,DIFF,page_mat)[1] # 固定d, DIFF下的page rank
 
     if " " in input_words: # 多輸入
         input_words = input_words.split(" ")
-    
     
     s = ""
     
@@ -296,16 +311,13 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
                     s += f"page{rank[i]} "
         else:
             s += "none"
-    # s += "\n"
     print(s)
 
     
 
-
-
-# Q1()
-# Q2()
-# Q3()
+Q1()
+Q2()
+Q3()
 
 with open("list.txt") as f:
         test = f.read().split("\n")
@@ -322,24 +334,4 @@ while s!= "*end*":
     new_time = time.time()
     print(f"--------It cost {new_time - old_time} sec to search--------")
     s = input("Type word(s) you want to search\n> ")
-
-
-# 確定有page連到page500
-# target_dictionary = "./web-search-files/"
-# listdir = os.listdir(target_dictionary)
-# listdir.sort(key = lambda s: int(s[4:])) # sort file name with number
-# have500 = []
-# for file in listdir:
-#     path = target_dictionary + file
-#     with open(path) as f:
-#         data = f.read() # str
-#         data_list = data.split("\n") # str -> list
-#         split_index = data_list.index("---------------------")
-#         pages = data_list[:split_index] # pages are before the line
-#         pages = [int(pages[i][4:]) for i in range(len(pages))] # page100 -> 100
-#     if 500 in pages:
-#         have500.append(f"{file}")
-# print(have500)
-
-
 
