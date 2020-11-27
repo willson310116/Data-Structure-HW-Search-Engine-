@@ -5,7 +5,7 @@ import time
 ################ Page Rank list ################
 def getpage():
     '''
-    This function will return the page rank matrix as a shape of (500,500) numpy.ndarray
+    This function will return the page rank matrix as a shape of (501,501) numpy.ndarray
     and the # of connections of each page as a dictionary.
     '''
     target_dictionary = "./web-search-files/"
@@ -61,7 +61,7 @@ def write_Q1_ans(rank,update,connect,d,DIFF):
     This function will write our result 
     (the rank of the pages, connections of each pages and their importance value) 
     into the corresponding files
-    """
+    """ 
     ans = []
     for i in range(len(rank)):
         result = f"page{rank[i]}\t{connect[rank[i]]}\t{round(update[rank[i]],8)}"
