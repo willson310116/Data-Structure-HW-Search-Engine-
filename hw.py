@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import time
+
 ################ Page Rank list ################
 def getpage():
     '''
@@ -34,7 +35,7 @@ def getpage():
             page_mat.append(page_vector)
             connect[int(file[4:])] = 0
 
-    page_mat = np.array(page_mat) #This matrix should be transposed
+    page_mat = np.array(page_mat) # This matrix should be transposed
     return page_mat.T, connect
 
 
@@ -45,7 +46,6 @@ def page_rank(d,DIFF,page_mat):
     DIFF is recommended to be a float under 0.1
     """
     page_mat_mod = page_mat * d
-    # init = np.array([1/500]*500)
     init = np.array([1/501]*501) # N = 501
     update = init.copy() # avoid changing init
     while True:
@@ -58,7 +58,8 @@ def page_rank(d,DIFF,page_mat):
 
 def write_Q1_ans(rank,update,connect,d,DIFF):
     """
-    This function will write our result (the rank of the pages, connections of each pages and their importance value) 
+    This function will write our result 
+    (the rank of the pages, connections of each pages and their importance value) 
     into the corresponding files
     """
     ans = []
@@ -149,14 +150,17 @@ def Q2():
 def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
     """
     This function will find the top 10 hit page of the words contained in the input_list.
+    
     If the item in input_list is a str which represents a single word input,
     then it will just print the reuslt(top 10 page).
+
     If the item in input_list is a list which represents multiple words input,
-    then it will print two result, which are AND OR. AND means the page should contain all the input words,
+    then it will print two results, which are AND and OR. AND means the page should contain all the input words,
     while OR means the page can contain any of the input words.
+    
     Lastly, the function will write the result to the corresponding file.
     """
-    rank = page_rank(d,DIFF,page_mat)[1] # 固定d, DIFF下的page rank
+    rank = page_rank(d,DIFF,page_mat)[1] # page rank with fixed d, DIFF
     
     for i in range(len(input_list)):
         if " " in input_list[i]:
@@ -164,36 +168,36 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
     s = ""
     
     for i in range(len(input_list)):
-		# 單一輸入(str)
+		# single input (str)
         if not isinstance(input_list[i],list):
 
             # s += f"{input_list[i]}\t"
 
-            if input_list[i] in word_list: # web有這個字
+            if input_list[i] in word_list: # the word exists in web
                 count = 0
                 for j in range(len(rank)):
                     if rank[j] == 500:
                         continue
-                    elif count >= 10: #只算輸出前10個page
+                    elif count >= 10: # only count for top 10 pages
                         break
                     elif input_list[i] in word_dict[rank[j]]:
                         count += 1
                         s += f"page{rank[j]} "
-            else: # web沒有這個字
+            else: # the word doesn't exist in web
                 s += "none"
 
-		# 多輸入(list)
+		# multiple inputs (list)
         else:
             item = ""
             for a in range(len(input_list[i])):
                 item += f"{input_list[i][a]} "
-			# AND 部分
+			# AND part
 
             # s += f"AND ({item.strip()})\t"
             s += f"AND "
 
             count = 0
-            if all(word in word_list for word in input_list[i]): # 所有word出現在web裡面->True
+            if all(word in word_list for word in input_list[i]): # all words exist in web -> True
                 for j in range(len(rank)):
                     if rank[j] == 500:
                         continue
@@ -202,19 +206,19 @@ def search_engine(d,DIFF,page_mat,input_list,word_list,word_dict):
                     elif all(word in word_dict[rank[j]] for word in input_list[i]):
                         count += 1
                         s += f"page{rank[j]} "
-                    elif j == len(rank)-1 and count == 0: # 沒有一個page同時有這些word的情況 (OR不會有這種情況)
+                    elif j == len(rank)-1 and count == 0: # none of the word exists in the page (OR doesn't have this situation)
                         s += "none"
             else:
                 s += "none"
 
             s += "\n"
 
-			# OR 部分
+			# OR part
 
             s += f"OR "
 
             count = 0
-            if any(word in word_list for word in input_list[i]): # 任何一個word出現在web裡面->True
+            if any(word in word_list for word in input_list[i]): # any word exists in web -> True
                 for j in range(len(rank)):
                     if rank[j] == 500:
                         continue
@@ -238,7 +242,7 @@ def Q3():
     This function execute search_engine with some combinations of d and DIFF.
     """
     page_mat = getpage()[0]
-    word_list, word_dict = getword() # word_list: web 裡面所有的字，sorted list, word_dict: 每個page包含的字，dict
+    word_list, word_dict = getword() # word_list: all the words in web(sorted list), word_dict: all the words contained in each page(dict)
     with open("list.txt") as f:
         test = f.read().split("\n")
     d_list = [0.25, 0.45, 0.65, 0.85]
@@ -253,15 +257,15 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
     Different from search_engine, this function allows users to search words manually
     by input words and assign d and DIFF.
     """
-    rank = page_rank(d,DIFF,page_mat)[1] # 固定d, DIFF下的page rank
+    rank = page_rank(d,DIFF,page_mat)[1] # page rank with fixed d, DIFF
 
-    if " " in input_words: # 多輸入
+    if " " in input_words: # multiple inputs
         input_words = input_words.split(" ")
     
     s = ""
     
-    if isinstance(input_words,str): # 單一輸入
-        if input_words in word_list: # web有這個字
+    if isinstance(input_words,str): # single input
+        if input_words in word_list: # the word exists in web
             count = 0
             for i in range(len(rank)):
                 if rank[i] == 500:
@@ -271,15 +275,15 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
                 elif input_words in word_dict[rank[i]]:
                     count += 1
                     s += f"page{rank[i]} "
-        else: # web 沒這個字
+        else: # the word doesn't exist
             s += "none"
 
-    elif isinstance(input_words,list): # 多輸入
+    elif isinstance(input_words,list): # multiple inputs
 
         # AND part
         s += f"AND "
         count = 0
-        if all(word in word_list for word in input_words): # 所有word出現在web裡面->True
+        if all(word in word_list for word in input_words): # all words exist in web -> True
             for i in range(len(rank)):
                 if rank[i] == 500:
                     continue
@@ -288,7 +292,7 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
                 elif all(word in word_dict[rank[i]] for word in input_words):
                     count += 1
                     s += f"page{rank[i]} "
-                elif i == len(rank)-1 and count == 0: # 沒有一個page同時有這些word的情況 (OR不會有這種情況)
+                elif i == len(rank)-1 and count == 0: # none of the word exists in the page (OR doesn't have this situation)
                     s += "none"
         else:
             s += "none"
@@ -300,7 +304,7 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
         s += "OR "
 
         count = 0
-        if any(word in word_list for word in input_words): # 任何一個word出現在web裡面->True
+        if any(word in word_list for word in input_words): # any word exists in web -> True
             for i in range(len(rank)):
                 if rank[i] == 500:
                     continue
@@ -313,25 +317,56 @@ def search_engine_2(d,DIFF,page_mat,input_words,word_list,word_dict):
             s += "none"
     print(s)
 
+def main1():
+    """
+    The main1 function executes function search_engine_2 by inputing d, DIFF manually 
+    and print the result(top 10 pages); users can type *end* to end the function.
+    """
+    with open("list.txt") as f:
+        test = f.read().split("\n")
+
+    page_mat = getpage()[0] # get page matrix
+    word_list, word_dict = getword()
+    s = input("Type word(s) you want to search\n> ")
+    while s!= "*end*":
+        d = float(input("Assign a d (a float from 0~1)\n> "))
+        DIFF = float(input("Assign a DIFF (a float under 0.1 is recommended)\n> "))
+        old_time = time.time()
+        search_engine_2(d, DIFF, page_mat, s, word_list, word_dict)
+        new_time = time.time()
+        print(f"--------It cost {new_time - old_time} sec to search--------")
+        s = input("Type word(s) you want to search\n> ")
+
+def main2():
+    """
+    The main function executes function search_engine_2 with fixed d, DIFF 
+    and print the result(top 10 pages); users can type *end* to end the function.
+    """
+    with open("list.txt") as f:
+        test = f.read().split("\n")
+
+    page_mat = getpage()[0] # get page matrix
+    word_list, word_dict = getword()
+
+    d = float(input("Assign a d (a float from 0~1)\n> "))
+    DIFF = float(input("Assign a DIFF (a float under 0.1 is recommended)\n> "))
+    s = input("Type word(s) you want to search\n> ")
     
+    while s!= "*end*":
+        old_time = time.time()
+        search_engine_2(d, DIFF, page_mat, s, word_list, word_dict)
+        new_time = time.time()
+        print(f"--------It cost {round(new_time - old_time, 8)} sec to search--------")
+        s = input("Type word(s) you want to search\n> ")
 
 Q1()
 Q2()
 Q3()
 
-with open("list.txt") as f:
-        test = f.read().split("\n")
-
-page_mat = getpage()[0] # get page matrix
-word_list, word_dict = getword()
-
-s = input("Type word(s) you want to search\n> ")
-while s!= "*end*":
-    d = float(input("Assign a d (a float from 0~1)\n> "))
-    DIFF = float(input("Assign a DIFF (a float under 0.1 is recommended)\n> "))
-    old_time = time.time()
-    search_engine_2(d, DIFF, page_mat, s, word_list, word_dict)
-    new_time = time.time()
-    print(f"--------It cost {new_time - old_time} sec to search--------")
-    s = input("Type word(s) you want to search\n> ")
-
+choice = input("Type 1 if you want to fix d and DIFF when searching word(s)\nType 2 if you don't\n> ")
+if choice == "1":
+    main2()
+elif choice == "2":
+    main1()
+else:
+    print("Wrong input")
