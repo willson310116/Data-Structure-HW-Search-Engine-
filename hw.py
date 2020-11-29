@@ -10,7 +10,8 @@ def getpage():
     '''
     target_dictionary = "./web-search-files/"
     listdir = os.listdir(target_dictionary)
-    listdir.remove(".DS_Store")
+    if os.path.isfile(".DS_Store"):
+        listdir.remove(".DS_Store")
     listdir.sort(key = lambda s: float(s[4:])) # sort file name with number
     
     page_mat = []
