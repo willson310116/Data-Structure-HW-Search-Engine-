@@ -1,5 +1,15 @@
-# Data Structure HW_Search Engine
+# Search-Engine-simple-version
 
+## Abstract
+It's a programming assignment of course Data Structures Fall 2020.
+
+## Usage
+***There is only 1 source code file, so just run the code with python hw.py on terminal, then it will work right away with instruction printed on the terminal.***
+```python
+python3 search.py
+```
+
+## Function details
 - The following shows the simple description, rough time complexity and rough space complexity of functions in the source code in order.
 ___
 
@@ -50,4 +60,4 @@ ___
 
 *Functions which are not presented above are used for searching words manually. There are 2 options provided, one allows the users to fix d, DIFF before searching; the other needs to assign d, DIFF before searching every time. The searching accepts single and multiple inputs (with space separated) as well. The time/space complexity of both options are O $(n^2)$, but obviously the latter option cost more time.*
 
-***There is only 1 source code file, so just run the code with python hw.py on terminal, then it will work right away with instruction printed on the terminal.***
+
